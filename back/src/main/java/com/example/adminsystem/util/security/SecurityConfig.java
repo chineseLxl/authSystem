@@ -1,7 +1,9 @@
 package com.example.adminsystem.util.security;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.example.adminsystem.service.RedisService;
 import com.example.adminsystem.util.TokenUtil;
+import com.example.adminsystem.util.webSocket.MyWebSocketHandler;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,7 +47,11 @@ public class SecurityConfig {
     @Autowired
     private CustomAuthorizationManager customAuthorizationManager;
     @Autowired
+    private MyWebSocketHandler webSocketHandler;
+    @Autowired
     WebApplicationContext applicationContext;
+    @Autowired
+    private RedisService redisService;
     @Value("${role.hierarchy}")
     private String hierarchy;
     @Bean
@@ -96,11 +102,15 @@ public class SecurityConfig {
                 chain.doFilter(request,response);
                 return;
             }
+            String jwt = httpServletRequest.getHeader("jwt");
+            if (jwt == null) {
+                jwt = httpServletRequest.getHeader("Sec-WebSocket-Protocol");
+            }
+//            if (redisService.isBlacklistExist(jwt)) {
+//                chain.doFilter(request,response);
+//                return;
+//            }
             try {
-                String jwt = httpServletRequest.getHeader("jwt");
-                if (jwt == null) {
-                    jwt = httpServletRequest.getHeader("Sec-WebSocket-Protocol");
-                }
                 Map<String,String> jwtMap = tokenUtil.parseToken(jwt);
                 UserDetails user = security.loadUserByUsername(jwtMap.get("userName"));
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

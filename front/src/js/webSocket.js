@@ -2,7 +2,7 @@ import {
 	router,
 } from '@/router/router.js'
 
-let jwt = sessionStorage.getItem("jwt");
+let jwt = localStorage.getItem("jwt");
 let websocket = new WebSocket("ws://localhost:8081/channel/user", [jwt]);
 
 // 连接断开

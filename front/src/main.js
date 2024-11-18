@@ -23,7 +23,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 
 async function init() {
-	if (sessionStorage.getItem("jwt")) {
+	if (localStorage.getItem("jwt")) {
 		await initMenu("/system");
 	}
 }
@@ -33,7 +33,7 @@ init()
 // 导航守卫
 router.beforeEach((to, from, next) => {
 	if(to.path === "/index") {
-		let jwt = sessionStorage.getItem("jwt");
+		let jwt = localStorage.getItem("jwt");
 		let websocket = new WebSocket("ws://localhost:8081/channel/user", [jwt]);
 		
 		// 连接断开
@@ -63,7 +63,7 @@ router.beforeEach((to, from, next) => {
 			// websocket.close();
 		}
 	}
-	console.log(sessionStorage.getItem("jwt"))
+	console.log(localStorage.getItem("jwt"))
 	// init()
 	window.document.title = to.meta.title == undefined ? '默认标题' : to.meta.title
 
@@ -81,9 +81,9 @@ router.beforeEach((to, from, next) => {
 // // 切换账号后更新路由 后置路由刷新页面
 router.afterEach((to, from, next) => {
 	if (to.path === '/index' && router.getRoutes().length == 2) {
-		console.log(sessionStorage.getItem("jwt"))
-		console.log(isNotEmpty(sessionStorage.getItem("jwt")))
-		if (isNotEmpty(sessionStorage.getItem("jwt"))) {
+		console.log(localStorage.getItem("jwt"))
+		console.log(isNotEmpty(localStorage.getItem("jwt")))
+		if (isNotEmpty(localStorage.getItem("jwt"))) {
 			location.reload()
 		} else {
 			router.replace("/")

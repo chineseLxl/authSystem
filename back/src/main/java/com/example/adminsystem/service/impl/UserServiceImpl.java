@@ -3,19 +3,18 @@ package com.example.adminsystem.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.adminsystem.dao.*;
 import com.example.adminsystem.entity.*;
-import com.example.adminsystem.service.AuthorityService;
-import com.example.adminsystem.service.MenuService;
-import com.example.adminsystem.service.RoleAuthorityService;
-import com.example.adminsystem.service.UserService;
+import com.example.adminsystem.service.*;
 import com.example.adminsystem.util.JsonResult;
 import com.example.adminsystem.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -55,6 +54,8 @@ public class UserServiceImpl implements UserService {
     private TokenUtil tokenUtil;
     @Autowired
     private RoleAuthorityService roleAuthorityService;
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
 
     @Override
@@ -69,7 +70,16 @@ public class UserServiceImpl implements UserService {
         Integer rid = userRoleMapper.selectOne(new QueryWrapper<UserRole>().eq("user_id", uid)).getRid();
         String roleName = roleMapper.selectOne(new QueryWrapper<Role>().eq("id", rid)).getName();
         Map<String,Object> jsonMap = new HashMap<>();
-        jsonMap.put("jwt", tokenUtil.getToken(rid.toString(),username,roleName));
+        String jwt = tokenUtil.getToken(rid.toString(),username,roleName);
+        String redisJwt = (String) redisTemplate.opsForHash().get("loginUserList", username);
+        if (redisJwt == null) {
+            redisTemplate.opsForHash().put("loginUserList", username, jwt);
+        } else {
+            redisTemplate.opsForHash().put("jwtBlackList",redisJwt,"1");
+            redisTemplate.opsForHash().getOperations().expire(redisJwt,1, TimeUnit.HOURS);
+            redisTemplate.opsForHash().put("loginUserList", username, jwt);
+        }
+        jsonMap.put("jwt", jwt);
         String[] strings = {"path", "pname", "component", "meta"};
         List<Catalogue> catalogueList = roleAuthorityService.getRoleAuthRouter(rid, strings);
         jsonMap.put("routers", catalogueList);

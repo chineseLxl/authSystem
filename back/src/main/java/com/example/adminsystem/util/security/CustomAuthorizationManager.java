@@ -4,6 +4,7 @@ import com.example.adminsystem.entity.NowAuthority;
 import com.example.adminsystem.service.RedisService;
 import com.example.adminsystem.service.RoleAuthorityService;
 import com.example.adminsystem.service.RoleService;
+import com.example.adminsystem.util.webSocket.MyWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -29,9 +30,13 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
     private RedisService redisService;
     @Autowired
     private NowAuthority nowAuthority;
+
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
-        if (authentication.get().getAuthorities().toArray()[0].toString().equals("ROLE_ANONYMOUS")) {
+        System.out.println(object.getRequest().getHeader("jwt"));
+        System.out.println(redisService.isBlacklistExist(object.getRequest().getHeader("jwt")));
+        if (authentication.get().getAuthorities().toArray()[0].toString().equals("ROLE_ANONYMOUS") ||
+            redisService.isBlacklistExist(object.getRequest().getHeader("jwt"))) {
             return new AuthorizationDecision(false);
         } else {
             if (nowAuthority.getRoleList() == null) {

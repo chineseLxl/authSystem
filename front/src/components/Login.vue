@@ -56,12 +56,13 @@
 					if(res.data.code == 1) {
 						resetRouter()
 						console.log(router.match)
-						sessionStorage.setItem("routeList", "")
-						sessionStorage.setItem("jwt", res.data.data.jwt)
+						localStorage.setItem("routeList", "")
+						localStorage.setItem("jwt", res.data.data.jwt)
 						const routeList = res.data.data.routers;
 						console.log(routeList)
 						// 缓存路由地址
-						sessionStorage.setItem("routeList", JSON.stringify(routeList))
+						// sessionStorage.setItem("routeList", JSON.stringify(routeList))
+						localStorage.setItem("routeList", JSON.stringify(routeList))
 
 						console.log(router.getRoutes())
 						this.$router.replace('/index')

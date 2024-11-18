@@ -13,7 +13,7 @@ let baseURL = "/";
 const http = axios.create({
   baseURL,
   headers: {
-  	"jwt": sessionStorage.getItem("jwt")
+  	"jwt": localStorage.getItem("jwt")
   }
 })
 

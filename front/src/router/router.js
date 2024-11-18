@@ -99,7 +99,7 @@ function initMenu() {
 		"name": "system",
 		"children": [],
 	}
-	for (let value of JSON.parse(sessionStorage.getItem("routeList"))) {
+	for (let value of JSON.parse(localStorage.getItem("routeList"))) {
 		let comp = ""
 		// 子路由设置
 		var clist = []

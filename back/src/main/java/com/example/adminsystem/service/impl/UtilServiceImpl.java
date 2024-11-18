@@ -51,11 +51,12 @@ public class UtilServiceImpl implements UtilService {
     @Override
     @PostConstruct
     public void PostConstruc() {
-        redisTemplate.opsForValue().set("test", "启动时redis测试");
-        redisService.updateAuth();
-        System.out.println(redisTemplate.opsForHash().entries("catalogue"));
-        System.out.println(redisTemplate.opsForHash().entries("menu"));
-        System.out.println("启动时构造:" + redisTemplate.opsForValue().get("test"));
+//        redisTemplate.opsForHash().put("jwtBlackList","","");
+//        redisTemplate.opsForValue().set("test", "启动时redis测试");
+//        redisService.updateAuth();
+//        System.out.println(redisTemplate.opsForHash().entries("catalogue"));
+//        System.out.println(redisTemplate.opsForHash().entries("menu"));
+//        System.out.println("启动时构造:" + redisTemplate.opsForValue().get("test"));
     }
 
 }
